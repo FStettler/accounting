@@ -1,0 +1,53 @@
+{% include 'layout.html' %}
+
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Book a ledger
+        </div>
+        <div class="card-body">
+            <form method="POST" id="my-form">
+                
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" class="form-control" name="ledger_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" class="form-control" name="description" required>
+                </div>
+                
+
+                <div class="form-group">
+                    <button id="add-row-button">Add line</button>
+    
+                    <table id="info" name="data">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Book ledger</button>
+                <input type="hidden" id="table-data" name="table_data">
+            </form>
+
+         
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="{{ url_for('static', path='/ledgers/js/table.js') }}"></script>

@@ -1,0 +1,105 @@
+{% include 'layout.html' %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Let's edit your ledger!
+        </div>
+        <div class="card-body">
+
+            <form method="POST" id="my-form">
+                
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" class="form-control" name="ledger_date" value="{{ledgers.ledger_date}}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" class="form-control" name="description" value="{{ledgers.description}}" required>
+                </div>
+                
+
+                <div class="form-group">
+                    <button id="add-row-button">Add line</button>
+    
+                    <table id="info" name="data">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                                {% for line in ledgers.debits %}
+
+                                    <tr class="pointer alert alert-success">
+
+                                        <td>
+                                            <select  name='debit_account'>
+                                            <option {% if line[0] == "Cash" %} selected="selected" {% endif %}>Cash</option>
+                                            <option {% if line[0] == "Bank" %} selected="selected" {% endif %}>Bank</option>
+                                            <option {% if line[0] == "Debtors" %} selected="selected" {% endif %}>Debtors</option>
+                                            <option {% if line[0] == "Sales" %} selected="selected" {% endif %}>Sales</option>
+                                            <option {% if line[0] == "Purchases" %} selected="selected" {% endif %}>Purchases</option>
+                                            <option {% if line[0] == "Capital" %} selected="selected" {% endif %}>Capital</option>
+                                        </td>
+
+
+                                        <td>
+                                            <input type="number" name="amount" value="{{line[1]}}">
+                                        </td>
+
+                                        <td>
+                                            <button onclick="deleteRow()"> Delete line</button>
+                                        </td>
+                                    </tr>
+                                                                        
+                                {% endfor%}
+
+
+                                {% for line in ledgers.credits %}
+
+                                    <tr class="pointer alert alert-success">
+
+                                        <td>
+                                            <select  name='credit_account'>
+                                            <option {% if line[0] == "Cash" %} selected="selected" {% endif %}>Cash</option>
+                                            <option {% if line[0] == "Bank" %} selected="selected" {% endif %}>Bank</option>
+                                            <option {% if line[0] == "Debtors" %} selected="selected" {% endif %}>Debtors</option>
+                                            <option {% if line[0] == "Sales" %} selected="selected" {% endif %}>Sales</option>
+                                            <option {% if line[0] == "Purchases" %} selected="selected" {% endif %}>Purchases</option>
+                                            <option {% if line[0] == "Capital" %} selected="selected" {% endif %}>Capital</option>
+                                        </td>
+
+
+                                        <td>
+                                            <input type="number" name="amount" value="{{line[1] * -1}}">
+                                        </td>
+
+                                        <td>
+                                            <button onclick="deleteRow()"> Delete line</button>
+                                        </td>
+                                    </tr>
+                                                                        
+                                {% endfor%}
+
+
+
+
+                            </tbody>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Edit ledger</button>
+                <button onclick="window.location.href='/ledgers/delete/{{ledgers.id}}'" type="button" class="btn btn-danger">Delete</button>
+                <input type="hidden" id="table-data" name="table_data">
+            </form>
+
+
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', path='/ledgers/js/table.js') }}"></script>
