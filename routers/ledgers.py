@@ -1,5 +1,9 @@
 import sys
 sys.path.append("..")
+import logging
+
+logging.basicConfig(filename="C:\\Users\\facun\\Desktop\\PYTHON\\FastAPI\\accounts\\accountsApp\\logger.log", level=logging.INFO)
+logger = logging.getLogger()
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Request, Form
 from fastapi.responses import HTMLResponse
@@ -60,6 +64,9 @@ async def create_ledger(request: Request,
                         ledger_date: date = Form(...),
                         table_data: str = Form(...)):
 
+    logger.info(table_data)
+    print(table_data)
+
     data = json.loads(table_data)
 
     #TODO: el botón de add line y delete line ejecutan el submit. Evitar que eso suceda
@@ -103,6 +110,9 @@ async def edit_ledger(request: Request, ledger_id: int, db: Session = Depends(ge
                         ledger_date: date = Form(...),
                         table_data: str = Form(...)):
     
+    logger.info(table_data)
+    print(table_data)
+
     ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
 
     data = json.loads(table_data)

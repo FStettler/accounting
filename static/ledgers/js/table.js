@@ -1,5 +1,5 @@
 // SUBMIT FUNCTION
-window.onload = function() {
+// window.onload = function() {
 
   const form = document.getElementById("my-form");
   const table = document.getElementById("info");
@@ -60,8 +60,9 @@ window.onload = function() {
 
   function addRow() {
     cols = 2
-    var addRowButtonCellIndex = table.rows.length;
-    var row = table.insertRow(addRowButtonCellIndex);
+    const tbody = table.querySelector("tbody");
+    var addRowButtonCellIndex = tbody.rows.length;
+    var row = tbody.insertRow(addRowButtonCellIndex);
     var cell = row.insertCell();
     cell.innerHTML = "<select  name='credit_account'>\
         <option>Cash</option>\
@@ -88,13 +89,6 @@ window.onload = function() {
   function deleteRow(table, row) {
     var rowIndex = row.rowIndex;
     table.deleteRow(rowIndex);
-    sumTableInputs()
+    sumTableInputs();
   }
-}
-
-
-
-
-
-
-  
+// }

@@ -1,0 +1,5 @@
+INFO:root:[{"account":"Cash","amount":"5.0"},{"account":"Cash","amount":"5.0"},{"account":"Cash","amount":"5.0"},{"account":"Cash","amount":"5.0"},{"account":"Cash","amount":"8.0"},{"account":"Cash","amount":"9.0"},{"account":"Cash","amount":"10.0"},{"account":"Cash","amount":"-10.0"},{"account":"Bank","amount":"-20.0"},{"account":"Cash","amount":"-10.0"}]
+INFO:root:[]
+INFO:root:[]
+INFO:root:[]
+INFO:root:[{"account":"Cash","amount":"1000"},{"account":"Cash","amount":"-1000"}]
