@@ -18,10 +18,12 @@
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-
     const tbody = table.querySelector("tbody");
     const rows = tbody.querySelectorAll("tr");
     const tableData = [];
+    const balance = document.getElementById("total");
+    const balance_control = parseFloat(balance.innerHTML); 
+
 
     rows.forEach((row) => {
       const select_cells = row.querySelectorAll("select");
@@ -36,8 +38,17 @@
       }
     });
 
-    tableDataInput.value = JSON.stringify(tableData);
-    form.submit();
+    function myFunction(message) {
+      alert(message);
+    }
+
+    if (balance_control != 0){
+      myFunction("Asiento no balancea");
+    } else{
+      tableDataInput.value = JSON.stringify(tableData);
+      form.submit();
+  }
+
   });
 
   // AFTER UPDATE FUNCTION
