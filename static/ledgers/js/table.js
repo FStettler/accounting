@@ -70,6 +70,7 @@
 
 
   function addRow() {
+    event.preventDefault();
     cols = 2
     const tbody = table.querySelector("tbody");
     var addRowButtonCellIndex = tbody.rows.length;
@@ -98,6 +99,7 @@
   }
 
   function deleteRow(table, row) {
+    event.preventDefault();
     var rowIndex = row.rowIndex;
     table.deleteRow(rowIndex);
     sumTableInputs();
