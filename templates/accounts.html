@@ -1,0 +1,50 @@
+{% include 'layout.html' %}
+
+<div class="container">
+    <div class="card text-center">
+        <div class="card-header">
+            All ledgers
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">List of your accounts!</h5>
+            <p class="card-text">All accounts booked into the system</p>
+            <a href="/accounts/create_account/" class="btn btn-primary">Create account</a>
+              
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Acc. ID</th>
+                    <th scope="col">Nature</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for account in accounts %}
+
+
+                        <tr class="pointer alert alert-success">
+
+                            <td>{{account.id}}</td>
+                            <td>{{account.nature}}</td>
+                            <td>{{account.name}}</td>
+                            <td>{% if account.status %} Active {% else %} Inactive {% endif %}</td>
+                            <td>
+                                <a href="edit_account/{{account.id}}" class="btn btn-primary">Edit</a>
+                                <button onclick="window.location.href='/accounts/delete/{{account.id}}'" type="button" class="btn btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                    
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+

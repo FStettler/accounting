@@ -37,11 +37,7 @@ templates = Jinja2Templates(directory="templates")
 db_dependency = Annotated[Session, Depends(get_db)]
 
 #TODO: quitar debits y credits. Dejar solo una variable con los datos económicos
-class LedgerRequest(BaseModel):
-    description: str = Field(min_length=3, max_length=50)
-    ledger_date: date
-    debits: dict
-    credits: dict
+
 
 #LIST ALL-----
 @router.get("/", response_class=HTMLResponse)
@@ -61,14 +57,6 @@ async def read_all_ledgers(request: Request, db: Session = Depends(get_db), date
 
     return templates.TemplateResponse("home.html", {'request':request, 'ledgers': ledgers})
 
-
-# @router.get("/", response_class=HTMLResponse)
-# async def looks_by_date(request: Request, ledger_date: date = Form(...), db: Session = Depends(get_db)):
-    
-#     ledgers = db.query(Ledgers).filter(Ledgers.ledger_date == ledger_date)
-
-#     return templates.TemplateResponse("home.html", {'request':request, 'ledgers': ledgers})
-    
 
 #BOOK---------
 @router.get("/book_ledger", response_class=HTMLResponse)
@@ -115,7 +103,7 @@ async def create_ledger(request: Request,
 
 #EDIT---------
 @router.get("/edit_ledger/{ledger_id}", response_class=HTMLResponse)
-async def edit_ledger(request: Request, ledger_id: int, db: Session = Depends(get_db)):
+async def edit_ledger_landing(request: Request, ledger_id: int, db: Session = Depends(get_db)):
     
     ledger = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
 

@@ -20,3 +20,12 @@ Traceback (most recent call last):
   File "C:\Python39\lib\asyncio\proactor_events.py", line 162, in _call_connection_lost
     self._sock.shutdown(socket.SHUT_RDWR)
 ConnectionResetError: [WinError 10054] Se ha forzado la interrupción de una conexión existente por el host remoto
+INFO:root:[{"account":"Bank","amount":"650"},{"account":"Cash","amount":"100.0"},{"account":"Capital","amount":"-650.0"},{"account":"Debtors","amount":"-100.0"}]
+INFO:root:[{"account":"Bank","amount":"650.0"},{"account":"Cash","amount":"100.0"},{"account":"Capital","amount":"-650.0"},{"account":"Debtors","amount":"-100.0"}]
+INFO:root:[{"account":"Bank","amount":"650.0"},{"account":"Cash","amount":"100.0"},{"account":"Capital","amount":"-650.0"},{"account":"Debtors","amount":"-100.0"}]
+INFO:root:[{"account":"Bank","amount":"650.0"},{"account":"Cash","amount":"100.0"},{"account":"Capital","amount":"-650.0"},{"account":"Debtors","amount":"-100.0"}]
+INFO:root:[{"account":"Bank","amount":"650.0"},{"account":"Cash","amount":"100.0"},{"account":"Capital","amount":"-650.0"},{"account":"Debtors","amount":"-100.0"}]
+INFO:root:[{"account":"Bank","amount":"100.0"},{"account":"Cash","amount":"-100.0"}]
+INFO:root:[{"account":"Bank","amount":"100.0"},{"account":"Cash","amount":"-100.0"}]
+INFO:root:[{"account":"Cash","amount":"100"},{"account":"Bank","amount":"-100"}]
+INFO:root:[{"account":"Cash","amount":"100.0"},{"account":"Bank","amount":"-100.0"},{"account":"Debtors","amount":"50"},{"account":"Capital","amount":"-50"}]

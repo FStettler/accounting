@@ -1,5 +1,7 @@
 // SUBMIT FUNCTION
-// window.onload = function() {
+window.onload = function() {
+  sumTableInputs()
+}
 function deleteRow(table, row) {
   event.preventDefault();
   var rowIndex = row.rowIndex;
@@ -29,7 +31,7 @@ function deleteRow(table, row) {
     const rows = tbody.querySelectorAll("tr");
     const tableData = [];
     const balance = document.getElementById("total");
-    const balance_control = parseFloat(balance.innerHTML); 
+    const balance_control = balance.innerHTML; 
 
 
     rows.forEach((row) => {
@@ -49,8 +51,8 @@ function deleteRow(table, row) {
       alert(message);
     }
 
-    if (balance_control != 0){
-      myFunction("Asiento no balancea");
+    if (balance_control != "0" || balance_control == ""){
+      myFunction("Ledger not balancing");
     } else{
       tableDataInput.value = JSON.stringify(tableData);
       form.submit();

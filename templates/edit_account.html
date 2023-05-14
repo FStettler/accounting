@@ -1,0 +1,47 @@
+{% include 'layout.html' %}
+
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Edit account
+        </div>
+        <div class="card-body">
+            <form method="POST" id="my-form">
+                
+                <div class="form-group">
+                    <label>Account code: {{account.id}}</label>
+                </div>
+
+                <div class="form-group">
+                    <label>Nature</label>
+                    <select  name='nature'>
+                        <option {% if account.nature == "Asset" %} selected="selected" {% endif %}>Asset</option>
+                        <option {% if account.nature == "Liability" %} selected="selected" {% endif %}>Liability</option>
+                        <option {% if account.nature == "Equity" %} selected="selected" {% endif %}>Equity</option>
+                        <option {% if account.nature == "Income" %} selected="selected" {% endif %}>Income</option>
+                        <option {% if account.nature == "Expense" %} selected="selected" {% endif %}>Expense</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" name="name" value="{{account.name}}"required>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select  name='account_status'>
+                        <option {% if account.status %} selected="selected" {% endif %}>Active</option>
+                        <option {% if not account.status %} selected="selected" {% endif %}>Inactive</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Edit account</button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+

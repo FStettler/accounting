@@ -1,0 +1,48 @@
+{% include 'layout.html' %}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Create account
+        </div>
+        <div class="card-body">
+            <form method="POST" id="my-form">
+                
+                <div class="form-group">
+                    <label>Account code</label>
+                    <input type="number" class="form-control" name="account_id" required>
+                    <span id="account_id_error">{% if error_message %} Account ID already exists!{% endif %}</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Nature</label>
+                    <select  name='nature'>
+                        <option>Asset</option>
+                        <option>Liability</option>
+                        <option>Equity</option>
+                        <option>Income</option>
+                        <option>Expense</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select  name='account_status'>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create account</button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+

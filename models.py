@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, PickleType, Date
+from sqlalchemy import Column, Integer, String, PickleType, Date, Boolean
 
 
 class Ledgers(Base):
@@ -13,4 +13,11 @@ class Ledgers(Base):
     debits = Column(PickleType)
     credits = Column(PickleType)
 
+class Accounts(Base):
+    __tablename__ = 'accounts'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    nature = Column(String) #Indicates the nature: assets, liabilities, equity
+    status = Column(Boolean, default=True) #Indicates if it's active or inactive
 
