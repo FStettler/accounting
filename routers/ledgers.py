@@ -45,12 +45,18 @@ class LedgerRequest(BaseModel):
 #LIST ALL-----
 @router.get("/", response_class=HTMLResponse)
 async def read_all_ledgers(request: Request, db: Session = Depends(get_db)):
-
     ledgers = db.query(Ledgers).all()
 
     return templates.TemplateResponse("home.html", {'request':request, 'ledgers': ledgers})
 
 
+# @router.get("/", response_class=HTMLResponse)
+# async def looks_by_date(request: Request, ledger_date: date = Form(...), db: Session = Depends(get_db)):
+    
+#     ledgers = db.query(Ledgers).filter(Ledgers.ledger_date == ledger_date)
+
+#     return templates.TemplateResponse("home.html", {'request':request, 'ledgers': ledgers})
+    
 
 #BOOK---------
 @router.get("/book_ledger", response_class=HTMLResponse)
@@ -93,7 +99,6 @@ async def create_ledger(request: Request,
     db.commit()
 
     return RedirectResponse(url="/ledgers", status_code=status.HTTP_302_FOUND)
-
 
 
 #EDIT---------

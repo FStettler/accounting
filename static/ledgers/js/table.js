@@ -1,5 +1,12 @@
 // SUBMIT FUNCTION
 // window.onload = function() {
+function deleteRow(table, row) {
+  event.preventDefault();
+  var rowIndex = row.rowIndex;
+  table.deleteRow(rowIndex);
+  sumTableInputs();
+}
+
 
   const form = document.getElementById("my-form");
   const table = document.getElementById("info");
@@ -67,6 +74,9 @@
 
   const addRowButton = document.getElementById("add-row-button");
   addRowButton.addEventListener("click", addRow);
+  // const deleteRowButton = document.getElementsById("delete-row-button");
+  // deleteRowButton[0].addEventListener("click", deleteRow);
+  // deleteRowButton[1].addEventListener("click", deleteRow);
 
 
   function addRow() {
@@ -98,10 +108,7 @@
     addInputEventListeners(); // Call the function to add the event listener to the new input elements
   }
 
-  function deleteRow(table, row) {
-    event.preventDefault();
-    var rowIndex = row.rowIndex;
-    table.deleteRow(rowIndex);
-    sumTableInputs();
-  }
+
+  
+
 // }
