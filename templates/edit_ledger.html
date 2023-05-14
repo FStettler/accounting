@@ -38,12 +38,11 @@
 
                                         <td>
                                             <select  name='debit_account'>
-                                            <option {% if line[0] == "Cash" %} selected="selected" {% endif %}>Cash</option>
-                                            <option {% if line[0] == "Bank" %} selected="selected" {% endif %}>Bank</option>
-                                            <option {% if line[0] == "Debtors" %} selected="selected" {% endif %}>Debtors</option>
-                                            <option {% if line[0] == "Sales" %} selected="selected" {% endif %}>Sales</option>
-                                            <option {% if line[0] == "Purchases" %} selected="selected" {% endif %}>Purchases</option>
-                                            <option {% if line[0] == "Capital" %} selected="selected" {% endif %}>Capital</option>
+
+                                            {% for account in accounts %}
+                                                <option {% if line[0] == account %} selected="selected" {% endif %}> {{ account}} </option>
+                                            {% endfor %}
+
                                         </td>
 
 
@@ -64,15 +63,13 @@
                                     <tr class="pointer alert alert-success">
 
                                         <td>
-                                            <select  name='credit_account'>
-                                            <option {% if line[0] == "Cash" %} selected="selected" {% endif %}>Cash</option>
-                                            <option {% if line[0] == "Bank" %} selected="selected" {% endif %}>Bank</option>
-                                            <option {% if line[0] == "Debtors" %} selected="selected" {% endif %}>Debtors</option>
-                                            <option {% if line[0] == "Sales" %} selected="selected" {% endif %}>Sales</option>
-                                            <option {% if line[0] == "Purchases" %} selected="selected" {% endif %}>Purchases</option>
-                                            <option {% if line[0] == "Capital" %} selected="selected" {% endif %}>Capital</option>
-                                        </td>
+                                            <select  name='debit_account'>
 
+                                            {% for account in accounts %}
+                                                <option {% if line[0] == account %} selected="selected" {% endif %}> {{ account}} </option>
+                                            {% endfor %}
+
+                                        </td>
 
                                         <td>
                                             <input type="number" name="amount" value="{{line[1] * -1}}">

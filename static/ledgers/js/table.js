@@ -80,24 +80,23 @@ function deleteRow(table, row) {
   // deleteRowButton[0].addEventListener("click", deleteRow);
   // deleteRowButton[1].addEventListener("click", deleteRow);
 
-
+  
   function addRow() {
     event.preventDefault();
     cols = 2
     const tbody = table.querySelector("tbody");
+    ;
+
+
+
     var addRowButtonCellIndex = tbody.rows.length;
     var row = tbody.insertRow(addRowButtonCellIndex);
-    var cell = row.insertCell();
-    cell.innerHTML = "<select  name='credit_account'>\
-        <option>Cash</option>\
-        <option>Bank</option>\
-        <option>Debtors</option>\
-        <option>Creditors</option>\
-        <option>Sales</option>\
-        <option>Purchases</option>\
-        <option>Capital</option>\
-    </select>";
+    var account_cell = row.insertCell();
+    account_cell.innerHTML = "<select  name='credit_account'></select>";
 
+
+    
+    
     var cell = row.insertCell();
     cell.innerHTML = "<input type='number' name='amount'>";
 
@@ -106,6 +105,25 @@ function deleteRow(table, row) {
     deleteRowButton.textContent = "Delete row";
     deleteRowButton.onclick = function() { deleteRow(table, row); };
     deleteRowButtonCell.appendChild(deleteRowButton);
+
+
+    // const select = document.getElementsByName("credit_account");
+  // Check if the accounts array exists and is not empty
+    let data;
+    fetch("/ledgers/fetch_accounts")
+        .then(response => response.json())
+        .then(json => {
+            accounts = JSON.parse(json);
+            // const accounts = JSON.parse(data);
+            for (let i = 0; i < accounts.length; i++) {
+              const option = document.createElement("option");
+              option.value = accounts[i];
+              option.textContent = accounts[i];
+              account_cell.querySelector("select").appendChild(option);
+            }
+        });
+
+  
 
     addInputEventListeners(); // Call the function to add the event listener to the new input elements
   }

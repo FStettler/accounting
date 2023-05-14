@@ -44,7 +44,6 @@ class AccountRequest(BaseModel):
 @router.get("/", response_class=HTMLResponse)
 async def get_all_accounts(request: Request, db: db_dependency):
     accounts = db.query(Accounts).all()
-
     return templates.TemplateResponse("accounts.html", {'request':request, 'accounts': accounts})
 
 

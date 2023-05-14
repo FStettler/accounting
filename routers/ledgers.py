@@ -12,7 +12,7 @@ from typing import Annotated, Optional
 from starlette import status
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from models import Ledgers
+from models import Ledgers, Accounts
 from database import SessionLocal
 from pydantic import BaseModel, Field
 from datetime import date
@@ -60,8 +60,18 @@ async def read_all_ledgers(request: Request, db: Session = Depends(get_db), date
 
 #BOOK---------
 @router.get("/book_ledger", response_class=HTMLResponse)
-async def create_ledger_landing(request: Request):
+async def create_ledger_landing(request: Request, db: Session = Depends(get_db)):
+
+
     return templates.TemplateResponse("book_ledger.html",{'request': request})
+
+@router.get("/fetch_accounts")
+async def fetch_accounts(request: Request, db: Session = Depends(get_db)):
+    accounts = db.query(Accounts).all()
+    
+    accounts_dict = [account.name for account in accounts]
+   
+    return json.dumps(accounts_dict)
 
 @router.post("/book_ledger", response_class=HTMLResponse)
 async def create_ledger(request: Request,
@@ -105,9 +115,12 @@ async def create_ledger(request: Request,
 @router.get("/edit_ledger/{ledger_id}", response_class=HTMLResponse)
 async def edit_ledger_landing(request: Request, ledger_id: int, db: Session = Depends(get_db)):
     
+    accounts = db.query(Accounts).all()
+    accounts_dict = [account.name for account in accounts]
+
     ledger = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
 
-    return templates.TemplateResponse("edit_ledger.html", {"request":request, "ledgers": ledger})
+    return templates.TemplateResponse("edit_ledger.html", {"request":request, "ledgers": ledger, 'accounts':accounts_dict})
 
 @router.post("/edit_ledger/{ledger_id}", response_class=HTMLResponse)
 async def edit_ledger(request: Request, ledger_id: int, db: Session = Depends(get_db),
