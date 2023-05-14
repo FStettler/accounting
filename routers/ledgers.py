@@ -5,10 +5,10 @@ import logging
 logging.basicConfig(filename="C:\\Users\\facun\\Desktop\\PYTHON\\FastAPI\\accounts\\accountsApp\\logger.log", level=logging.INFO)
 logger = logging.getLogger()
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Request, Form
+from fastapi import APIRouter, Depends, Query, Path, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from typing import Annotated
+from typing import Annotated, Optional
 from starlette import status
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
@@ -17,6 +17,7 @@ from database import SessionLocal
 from pydantic import BaseModel, Field
 from datetime import date
 import json
+from datetime import datetime
 
 router = APIRouter(
     prefix="/ledgers",
@@ -44,8 +45,19 @@ class LedgerRequest(BaseModel):
 
 #LIST ALL-----
 @router.get("/", response_class=HTMLResponse)
-async def read_all_ledgers(request: Request, db: Session = Depends(get_db)):
-    ledgers = db.query(Ledgers).all()
+async def read_all_ledgers(request: Request, db: Session = Depends(get_db), date_filter: Optional[str] = None):
+    
+    query = db.query(Ledgers)
+
+    if date_filter:
+        try:
+            date_filter = datetime.strptime(date_filter, "%Y-%m-%d").date()
+            query = query.filter(Ledgers.ledger_date == date_filter)
+        except ValueError:
+            # Handle invalid date format error here
+            pass
+
+    ledgers = query.all()
 
     return templates.TemplateResponse("home.html", {'request':request, 'ledgers': ledgers})
 
