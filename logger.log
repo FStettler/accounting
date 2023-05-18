@@ -91,3 +91,19 @@ INFO:root:[{"account":"Cash","amount":"100.0"},{"account":"VAT","amount":"400.0"
 INFO:root:[{"account":"other debtors","amount":"100.0"},{"account":"VAT","amount":"400.0"},{"account":"Other income","amount":"-500.0"}]
 INFO:root:[{"account":"other debtors","amount":"100.0"},{"account":"Bank","amount":"400.0"},{"account":"Other income","amount":"-500.0"}]
 INFO:root:[{"account":"Rent","amount":"400"},{"account":"VAT","amount":"100"},{"account":"Debtors","amount":"-500.0"}]
+INFO:root:[{"account":"Bank","amount":"100.0"},{"account":"VAT","amount":"400.0"},{"account":"cash","amount":"-100.0"},{"account":"Other income","amount":"-400.0"}]
+INFO:root:[{"account":"cash","amount":"10.0"},{"account":"cash","amount":"20.0"},{"account":"cash","amount":"-30.0"}]
+INFO:root:[{"account":"Bank","amount":"100.0"},{"account":"VAT","amount":"400.0"},{"account":"otra cosa","amount":"-100.0"},{"account":"Other income","amount":"-400.0"}]
+INFO:root:[{"account":"Bank","amount":"500.0"},{"account":"Capital","amount":"500.0"},{"account":"otra cosa","amount":"-1000.0"}]
+INFO:root:[{"account":"Bank","amount":"100.0"},{"account":"VAT","amount":"400.0"},{"account":"Cash","amount":"-100.0"},{"account":"Other income","amount":"-400.0"}]
+INFO:root:[{"account":"Cash","amount":"10.0"},{"account":"Cash","amount":"20.0"},{"account":"Cash","amount":"-30.0"}]
+INFO:root:[{"account":"Bank","amount":"500.0"},{"account":"Capital","amount":"500.0"},{"account":"Cash","amount":"-1000.0"}]
+INFO:root:[{"account":"Bank","amount":"100.0"},{"account":"VAT","amount":"400.0"},{"account":"Bank","amount":"-100.0"},{"account":"Other income","amount":"-400.0"}]
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost(None)
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost(None)>
+Traceback (most recent call last):
+  File "C:\Python39\lib\asyncio\events.py", line 80, in _run
+    self._context.run(self._callback, *self._args)
+  File "C:\Python39\lib\asyncio\proactor_events.py", line 162, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+ConnectionResetError: [WinError 10054] Se ha forzado la interrupción de una conexión existente por el host remoto

@@ -13,6 +13,9 @@ from database import SessionLocal
 from pydantic import BaseModel, Field
 from datetime import date
 import json
+from .auth import get_current_user
+
+user_dependency = Annotated[dict,Depends(get_current_user)]
 
 
 router = APIRouter(
@@ -42,23 +45,34 @@ class AccountRequest(BaseModel):
 #LIST ALL-----
 
 @router.get("/", response_class=HTMLResponse)
-async def get_all_accounts(request: Request, db: db_dependency):
+async def get_all_accounts(user: user_dependency, request: Request, db: db_dependency):
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
     accounts = db.query(Accounts).all()
     return templates.TemplateResponse("accounts.html", {'request':request, 'accounts': accounts})
 
 
 #BOOK---------
 @router.get("/create_account", response_class=HTMLResponse)
-async def create_account_landing(request: Request):
+async def create_account_landing(user: user_dependency, request: Request):
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
     return templates.TemplateResponse("create_account.html",{'request': request})
 
 @router.post("/create_account", response_class=HTMLResponse)
-async def create_account(request: Request,
+async def create_account(user: user_dependency, 
+                        request: Request,
                         db: db_dependency,
                         account_id: int = Form(...),
                         nature: str = Form(...),
                         name: str = Form(...),
                         account_status: str = Form(...)):
+    
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
     if account_status == "Active":
         account_status = True
@@ -82,21 +96,27 @@ async def create_account(request: Request,
 
 #EDIT---------
 @router.get("/edit_account/{account_id}", response_class=HTMLResponse)
-async def edit_account_landing(request: Request, account_id: int, db: db_dependency):
-    
+async def edit_account_landing(user: user_dependency, request: Request, account_id: int, db: db_dependency):
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
     account = db.query(Accounts).filter(Accounts.id == account_id).first()
 
     return templates.TemplateResponse("edit_account.html", {"request":request, "account": account})
 
 
 @router.post("/edit_account/{account_id}", response_class=HTMLResponse)
-async def edit_account(request: Request,
+async def edit_account(user: user_dependency, request: Request,
                         db: db_dependency,
                         account_id: int,
                         nature: str = Form(...),
                         name: str = Form(...),
                         account_status: str = Form(...)):
-    
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
     if account_status == "Active":
         account_status = True
     else:
@@ -114,20 +134,11 @@ async def edit_account(request: Request,
     return RedirectResponse(url="/accounts", status_code=status.HTTP_302_FOUND)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 @router.put("/edit_account/{account_id}", status_code=status.HTTP_201_CREATED)
-async def create_account(db: db_dependency, account_request: AccountRequest, account_id: int):
+async def create_account(user: user_dependency, db: db_dependency, account_request: AccountRequest, account_id: int):
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
     account_model = db.query(Accounts).filter(Accounts.id == account_id).first()
 
@@ -139,9 +150,13 @@ async def create_account(db: db_dependency, account_request: AccountRequest, acc
     db.add(account_model)
     db.commit()
 
+#TODO: create HTMLresponse endpoint for delete
 @router.delete("/delete_account/{account_id}", status_code=status.HTTP_201_CREATED)
-async def delete_account(db: db_dependency, account_id: int):
-    
+async def delete_account(user: user_dependency, db: db_dependency, account_id: int):
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
 
     db.query(Accounts).filter(Accounts.id == account_id).delete()
     db.commit()

@@ -5,7 +5,7 @@ import logging
 logging.basicConfig(filename="C:\\Users\\facun\\Desktop\\PYTHON\\FastAPI\\accounts\\accountsApp\\logger.log", level=logging.INFO)
 logger = logging.getLogger()
 
-from fastapi import APIRouter, Depends, Query, Path, Request, Form
+from fastapi import APIRouter, Depends, Query, Path, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Optional
@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 from datetime import date
 import json
 from datetime import datetime
+from .auth import get_current_user
 
 router = APIRouter(
     prefix="/ledgers",
@@ -32,18 +33,24 @@ def get_db():
     finally:
         db.close()
 
+
+
 templates = Jinja2Templates(directory="templates")
 
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict,Depends(get_current_user)]
 
 #TODO: quitar debits y credits. Dejar solo una variable con los datos económicos
 
 
 #LIST ALL-----
 @router.get("/", response_class=HTMLResponse)
-async def read_all_ledgers(request: Request, db: Session = Depends(get_db), date_filter: Optional[str] = None):
-    
-    query = db.query(Ledgers)
+async def read_all_ledgers(user: user_dependency, request: Request, db: Session = Depends(get_db), date_filter: Optional[str] = None):
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+       
+    query = db.query(Ledgers).filter(Ledgers.user_id == user.get('id'))
 
     if date_filter:
         try:
@@ -60,30 +67,39 @@ async def read_all_ledgers(request: Request, db: Session = Depends(get_db), date
 
 #BOOK---------
 @router.get("/book_ledger", response_class=HTMLResponse)
-async def create_ledger_landing(request: Request, db: Session = Depends(get_db)):
-
+async def create_ledger_landing(user: user_dependency, request: Request, db: Session = Depends(get_db)):
+    
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
     return templates.TemplateResponse("book_ledger.html",{'request': request})
 
 @router.get("/fetch_accounts")
-async def fetch_accounts(request: Request, db: Session = Depends(get_db)):
+async def fetch_accounts(user: user_dependency, request: Request, db: Session = Depends(get_db)):
+    
+    if user is None:
+        raise HTTPException(status_code=401, detail='Auth failed')
+        
     accounts = db.query(Accounts).all()
     
-    accounts_dict = [account.name for account in accounts]
+    accounts_dict = [account.name for account in accounts if account.status == True]
    
     return json.dumps(accounts_dict)
 
+
 @router.post("/book_ledger", response_class=HTMLResponse)
-async def create_ledger(request: Request,
+async def create_ledger(user: user_dependency, 
+                        request: Request,
                         db: Session = Depends(get_db),
                         description: str = Form(...),
                         ledger_date: date = Form(...),
                         table_data: str = Form(...)):
 
-    logger.info(table_data)
-    print(table_data)
-
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+    
     data = json.loads(table_data)
+    #shape: [{'account': 'Cash', 'amount':'20'}, {'account': 'Bank', 'amount':'-15'}, {'account': 'Debtors', 'amount':'-5'}]
 
     #TODO: el botón de add line y delete line ejecutan el submit. Evitar que eso suceda
 
@@ -104,6 +120,7 @@ async def create_ledger(request: Request,
     ledger_model.ledger_date = ledger_date
     ledger_model.debits = debits
     ledger_model.credits = credits
+    ledger_model.user_id = user.get('id')
 
     db.add(ledger_model)
     db.commit()
@@ -113,8 +130,11 @@ async def create_ledger(request: Request,
 
 #EDIT---------
 @router.get("/edit_ledger/{ledger_id}", response_class=HTMLResponse)
-async def edit_ledger_landing(request: Request, ledger_id: int, db: Session = Depends(get_db)):
-    
+async def edit_ledger_landing(user: user_dependency, request: Request, ledger_id: int, db: Session = Depends(get_db)):
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
     accounts = db.query(Accounts).all()
     accounts_dict = [account.name for account in accounts]
 
@@ -122,14 +142,17 @@ async def edit_ledger_landing(request: Request, ledger_id: int, db: Session = De
 
     return templates.TemplateResponse("edit_ledger.html", {"request":request, "ledgers": ledger, 'accounts':accounts_dict})
 
+#TODO: check if account is disabled to avoid using it when hitting edit ledger, cause the dropdown show display it anyways
 @router.post("/edit_ledger/{ledger_id}", response_class=HTMLResponse)
-async def edit_ledger(request: Request, ledger_id: int, db: Session = Depends(get_db),
+async def edit_ledger(user: user_dependency,request: Request, ledger_id: int, db: Session = Depends(get_db),
                         description: str = Form(...),
                         ledger_date: date = Form(...),
                         table_data: str = Form(...)):
-    
-    logger.info(table_data)
-    print(table_data)
+
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
 
     ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
 
@@ -163,8 +186,11 @@ async def edit_ledger(request: Request, ledger_id: int, db: Session = Depends(ge
 
 #DELETE-------
 @router.get("/delete/{ledger_id}", response_class=HTMLResponse)
-async def delete_ledger(db: Session = Depends(get_db), ledger_id: int = Path(gt=0)):
-    
+async def delete_ledger(user: user_dependency, db: Session = Depends(get_db), ledger_id: int = Path(gt=0)):
+
+    if user is None:
+        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
+
     ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
 
     if ledger_model is None:
