@@ -1,9 +1,8 @@
 import sys
 sys.path.append("..")
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from pydantic import BaseModel
 from database import SessionLocal
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -53,6 +52,11 @@ class LoginForm:
 
 
 
+def get_password_hash(password):
+    return bcrypt_context.hash(password)
+
+def verify_password(plain_password, hashed_password):
+    return bcrypt_context.verify(plain_password, hashed_password)
 
 
 def authenticateUser(username:str, password:str, db):
@@ -84,10 +88,10 @@ async def get_current_user(request: Request):
         user_role: str = payload.get('role')
 
         if username is None or user_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate user.')
+            logout(request)
         
         return {'username':username, 'id':user_id, 'user_role':user_role}
-    except:
+    except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate user.')
 
 
@@ -116,22 +120,51 @@ async def login(request: Request, db: db_dependency):
         msg = "Unknown error"
         return templates.TemplateResponse("login.html", {'request':request,'msg':msg})
 
-# @router.post("/", status_code=status.HTTP_201_CREATED)
-# async def create_user(create_user_request: CreateUserRequest, db: db_dependency):
+@router.get("/logout", response_class=HTMLResponse)
+async def logout(request: Request):
+    msg = "Logout Successful"
+    response = templates.TemplateResponse("login.html", {"request": request, "msg": msg})
+    response.delete_cookie(key="access_token")
+    return response
+
+@router.get("/register", response_class=HTMLResponse)
+async def register(request: Request):
+    return templates.TemplateResponse("register.html",{'request': request})
+
+
+@router.post("/register", response_class=HTMLResponse)
+async def register_user(request: Request, db: db_dependency,
+                        email:str = Form(...),
+                        username:str = Form(...),
+                        firstname:str = Form(...),
+                        lastname:str = Form(...),
+                        password:str = Form(...),
+                        password2:str = Form(...)):
     
-#     create_user_model = Users(
-#         email = create_user_request.email,
-#         username = create_user_request.username,
-#         first_name = create_user_request.first_name,
-#         last_name = create_user_request.last_name,
-#         role = create_user_request.role,
-#         hashed_password = bcrypt_context.hash(create_user_request.password),
-#         status = True
-#     )
+    validation1 = db.query(Users).filter(Users.username == username).first()
 
-#     db.add(create_user_model)
-#     db.commit()
+    validation2 = db.query(Users).filter(Users.email == email).first()
 
+    if password != password2 or validation1 is not None or validation2 is not None:
+        msg = 'Invalid registration request'
+        return templates.TemplateResponse("register.html",{'request':request,'msg':msg})
+    
+    user_model = Users()
+
+    user_model.username = username
+    user_model.email = email
+    user_model.first_name = firstname
+    user_model.last_name = lastname
+
+    hash_password = get_password_hash(password)
+    user_model.hashed_password = hash_password
+    user_model.status = True
+
+    db.add(user_model)
+    db.commit()
+
+    msg = 'User successfully created'
+    return templates.TemplateResponse("login.html", {'request':request, 'msg':msg})
 
 @router.post("/token")
 async def login_for_access_token(response: Response, form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
@@ -146,3 +179,5 @@ async def login_for_access_token(response: Response, form_data: Annotated[OAuth2
     response.set_cookie(key="access_token", value=token, httponly=True)
 
     return True
+
+

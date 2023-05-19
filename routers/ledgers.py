@@ -5,7 +5,7 @@ import logging
 logging.basicConfig(filename="C:\\Users\\facun\\Desktop\\PYTHON\\FastAPI\\accounts\\accountsApp\\logger.log", level=logging.INFO)
 logger = logging.getLogger()
 
-from fastapi import APIRouter, Depends, Query, Path, Request, Form, HTTPException
+from fastapi import APIRouter, Depends, Path, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Optional
@@ -14,7 +14,6 @@ from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from models import Ledgers, Accounts
 from database import SessionLocal
-from pydantic import BaseModel, Field
 from datetime import date
 import json
 from datetime import datetime
@@ -62,7 +61,8 @@ async def read_all_ledgers(user: user_dependency, request: Request, db: Session 
 
     ledgers = query.all()
 
-    return templates.TemplateResponse("home.html", {'request':request, 'ledgers': ledgers})
+    #TODO: Change home.html to ledgers.html for all references to home.html
+    return templates.TemplateResponse("home.html", {'request':request, 'ledgers': ledgers, 'user':user})
 
 
 #BOOK---------
@@ -72,7 +72,7 @@ async def create_ledger_landing(user: user_dependency, request: Request, db: Ses
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    return templates.TemplateResponse("book_ledger.html",{'request': request})
+    return templates.TemplateResponse("book_ledger.html",{'request': request, 'user':user})
 
 @router.get("/fetch_accounts")
 async def fetch_accounts(user: user_dependency, request: Request, db: Session = Depends(get_db)):
@@ -100,8 +100,6 @@ async def create_ledger(user: user_dependency,
     
     data = json.loads(table_data)
     #shape: [{'account': 'Cash', 'amount':'20'}, {'account': 'Bank', 'amount':'-15'}, {'account': 'Debtors', 'amount':'-5'}]
-
-    #TODO: el botón de add line y delete line ejecutan el submit. Evitar que eso suceda
 
     debits = []
     credits = []
@@ -140,7 +138,7 @@ async def edit_ledger_landing(user: user_dependency, request: Request, ledger_id
 
     ledger = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
 
-    return templates.TemplateResponse("edit_ledger.html", {"request":request, "ledgers": ledger, 'accounts':accounts_dict})
+    return templates.TemplateResponse("edit_ledger.html", {"request":request, "ledgers": ledger, 'accounts':accounts_dict, 'user': user})
 
 #TODO: check if account is disabled to avoid using it when hitting edit ledger, cause the dropdown show display it anyways
 @router.post("/edit_ledger/{ledger_id}", response_class=HTMLResponse)
@@ -157,8 +155,6 @@ async def edit_ledger(user: user_dependency,request: Request, ledger_id: int, db
     ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
 
     data = json.loads(table_data)
-
-    #TODO: el botón de add line y delete line ejecutan el submit. Evitar que eso suceda
 
     debits = []
     credits = []

@@ -1,18 +1,16 @@
 import sys
 sys.path.append("..")
 
-from fastapi import APIRouter, Depends, Query, Path, Request, Form
+from fastapi import APIRouter, Depends, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from typing import Annotated, Optional
+from typing import Annotated
 from starlette import status
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from models import Accounts
 from database import SessionLocal
 from pydantic import BaseModel, Field
-from datetime import date
-import json
 from .auth import get_current_user
 
 user_dependency = Annotated[dict,Depends(get_current_user)]
@@ -44,6 +42,7 @@ class AccountRequest(BaseModel):
 
 #LIST ALL-----
 
+#TODO: List accounts by user
 @router.get("/", response_class=HTMLResponse)
 async def get_all_accounts(user: user_dependency, request: Request, db: db_dependency):
 
@@ -51,7 +50,7 @@ async def get_all_accounts(user: user_dependency, request: Request, db: db_depen
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
     accounts = db.query(Accounts).all()
-    return templates.TemplateResponse("accounts.html", {'request':request, 'accounts': accounts})
+    return templates.TemplateResponse("accounts.html", {'request':request, 'accounts': accounts, 'user': user})
 
 
 #BOOK---------
@@ -60,7 +59,7 @@ async def create_account_landing(user: user_dependency, request: Request):
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    return templates.TemplateResponse("create_account.html",{'request': request})
+    return templates.TemplateResponse("create_account.html",{'request': request, 'user': user})
 
 @router.post("/create_account", response_class=HTMLResponse)
 async def create_account(user: user_dependency, 
@@ -80,7 +79,7 @@ async def create_account(user: user_dependency,
         account_status = False
 
     if db.query(Accounts).filter(Accounts.id == account_id).first():
-        return templates.TemplateResponse("create_account.html", {"request":request, "error_message": True})
+        return templates.TemplateResponse("create_account.html", {"request":request, "error_message": True, 'user': user})
 
     account_model = Accounts()
     account_model.id = account_id
@@ -103,7 +102,7 @@ async def edit_account_landing(user: user_dependency, request: Request, account_
 
     account = db.query(Accounts).filter(Accounts.id == account_id).first()
 
-    return templates.TemplateResponse("edit_account.html", {"request":request, "account": account})
+    return templates.TemplateResponse("edit_account.html", {"request":request, "account": account, 'user': user})
 
 
 @router.post("/edit_account/{account_id}", response_class=HTMLResponse)
