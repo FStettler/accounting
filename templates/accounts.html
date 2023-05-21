@@ -28,12 +28,12 @@
 
                         <tr class="pointer alert alert-success">
 
-                            <td>{{account.id}}</td>
+                            <td>{{account.account_id}}</td>
                             <td>{{account.nature}}</td>
                             <td>{{account.name}}</td>
                             <td>{% if account.status %} Active {% else %} Inactive {% endif %}</td>
                             <td>
-                                <a href="edit_account/{{account.id}}" class="btn btn-primary">Edit</a>
+                                <a href="edit_account/{{account.account_id}}" class="btn btn-primary">Edit</a>
                                 <button onclick="window.location.href='/accounts/delete/{{account.id}}'" type="button" class="btn btn-danger">Delete</button>
                             </td>
                         </tr>

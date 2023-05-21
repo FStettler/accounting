@@ -42,20 +42,20 @@ class AccountRequest(BaseModel):
 
 #LIST ALL-----
 
-#TODO: List accounts by user
 @router.get("/", response_class=HTMLResponse)
 async def get_all_accounts(user: user_dependency, request: Request, db: db_dependency):
 
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    accounts = db.query(Accounts).all()
+    accounts = db.query(Accounts).filter(Accounts.user_id == user.get('id'))
     return templates.TemplateResponse("accounts.html", {'request':request, 'accounts': accounts, 'user': user})
 
 
 #BOOK---------
 @router.get("/create_account", response_class=HTMLResponse)
 async def create_account_landing(user: user_dependency, request: Request):
+    
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
@@ -78,14 +78,15 @@ async def create_account(user: user_dependency,
     else:
         account_status = False
 
-    if db.query(Accounts).filter(Accounts.id == account_id).first():
+    if db.query(Accounts).filter(Accounts.account_id == account_id).filter(Accounts.user_id == user.get('id')).first():
         return templates.TemplateResponse("create_account.html", {"request":request, "error_message": True, 'user': user})
 
     account_model = Accounts()
-    account_model.id = account_id
+    account_model.account_id = account_id
     account_model.nature = nature
     account_model.name = name
     account_model.status = account_status
+    account_model.user_id = user.get('id')
 
     db.add(account_model)
     db.commit()
@@ -100,7 +101,8 @@ async def edit_account_landing(user: user_dependency, request: Request, account_
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    account = db.query(Accounts).filter(Accounts.id == account_id).first()
+    account = db.query(Accounts).filter(Accounts.account_id == account_id).filter(Accounts.user_id == user.get('id')).first()
+    
 
     return templates.TemplateResponse("edit_account.html", {"request":request, "account": account, 'user': user})
 
@@ -121,33 +123,17 @@ async def edit_account(user: user_dependency, request: Request,
     else:
         account_status = False
 
-    account_model = db.query(Accounts).filter(Accounts.id == account_id).first()
+    account_model = db.query(Accounts).filter(Accounts.account_id == account_id).filter(Accounts.user_id == user.get('id')).first()
 
     account_model.name = name
     account_model.nature = nature
     account_model.status = account_status
+
         
     db.add(account_model)
     db.commit()
 
     return RedirectResponse(url="/accounts", status_code=status.HTTP_302_FOUND)
-
-
-@router.put("/edit_account/{account_id}", status_code=status.HTTP_201_CREATED)
-async def create_account(user: user_dependency, db: db_dependency, account_request: AccountRequest, account_id: int):
-
-    if user is None:
-        return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
-
-    account_model = db.query(Accounts).filter(Accounts.id == account_id).first()
-
-    account_model.id = account_request.id
-    account_model.name = account_request.name
-    account_model.nature = account_request.nature
-    account_model.status = account_request.status
-        
-    db.add(account_model)
-    db.commit()
 
 #TODO: create HTMLresponse endpoint for delete
 @router.delete("/delete_account/{account_id}", status_code=status.HTTP_201_CREATED)
@@ -157,5 +143,5 @@ async def delete_account(user: user_dependency, db: db_dependency, account_id: i
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
 
-    db.query(Accounts).filter(Accounts.id == account_id).delete()
+    db.query(Accounts).filter(Accounts.account_id == account_id).delete()
     db.commit()

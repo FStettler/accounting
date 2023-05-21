@@ -40,6 +40,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict,Depends(get_current_user)]
 
 #TODO: quitar debits y credits. Dejar solo una variable con los datos económicos
+#TODO: gestionar ledger_id para distintos usuarios
 
 
 #LIST ALL-----
@@ -80,7 +81,7 @@ async def fetch_accounts(user: user_dependency, request: Request, db: Session = 
     if user is None:
         raise HTTPException(status_code=401, detail='Auth failed')
         
-    accounts = db.query(Accounts).all()
+    accounts = db.query(Accounts).filter(Accounts.user_id == user.get("id"))
     
     accounts_dict = [account.name for account in accounts if account.status == True]
    
@@ -89,7 +90,6 @@ async def fetch_accounts(user: user_dependency, request: Request, db: Session = 
 
 @router.post("/book_ledger", response_class=HTMLResponse)
 async def create_ledger(user: user_dependency, 
-                        request: Request,
                         db: Session = Depends(get_db),
                         description: str = Form(...),
                         ledger_date: date = Form(...),
@@ -133,10 +133,10 @@ async def edit_ledger_landing(user: user_dependency, request: Request, ledger_id
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    accounts = db.query(Accounts).all()
+    accounts = db.query(Accounts).filter(Accounts.user_id == user.get('id'))
     accounts_dict = [account.name for account in accounts]
 
-    ledger = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
+    ledger = db.query(Ledgers).filter(Ledgers.id == ledger_id).filter(Ledgers.user_id == user.get('id')).first()
 
     return templates.TemplateResponse("edit_ledger.html", {"request":request, "ledgers": ledger, 'accounts':accounts_dict, 'user': user})
 
@@ -152,7 +152,7 @@ async def edit_ledger(user: user_dependency,request: Request, ledger_id: int, db
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
 
-    ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
+    ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).filter(Ledgers.user_id == user.get('id')).first()
 
     data = json.loads(table_data)
 
@@ -187,12 +187,12 @@ async def delete_ledger(user: user_dependency, db: Session = Depends(get_db), le
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND)
 
-    ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).first()
+    ledger_model = db.query(Ledgers).filter(Ledgers.id == ledger_id).filter(Ledgers.user_id == user.get('id')).first()
 
     if ledger_model is None:
         raise RedirectResponse(url="/ledgers", status_code=status.HTTP_302_FOUND)
 
-    db.query(Ledgers).filter(Ledgers.id == ledger_id).delete()
+    db.query(Ledgers).filter(Ledgers.id == ledger_id).filter(Ledgers.user_id == user.get('id')).delete()
     db.commit()
 
     return RedirectResponse(url="/ledgers", status_code=status.HTTP_302_FOUND)
