@@ -1,0 +1,55 @@
+{% include 'layout.html' %}
+
+<div class="container">
+    <div class="card text-center">
+        <div class="card-header">
+            All ledgers
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">List your trial balance!</h5>
+            
+            <form method="get" action="{{ request.url.path }}">
+                <span>If no date is specified, the system will list a trial balance for all ledgers</span>
+                <br><label for="date_filter">Filter by date:</label>
+                <input type="date" id="date_filter" name="date_filter">
+                <button type="submit">Filter</button>
+            </form>
+              
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Acc. ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Debits</th>
+                    <th scope="col">Credits</th>
+                    <th scope="col">Actions</th>
+
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for account, amount in trial_balance.items() %}
+
+
+                        <tr class="pointer alert alert-success">
+
+                            <td>111</td>
+                            <td>{{account}}</td>
+                            <td>{% if amount > 0 %} {{amount}} {% else %} - {% endif %}</td>
+                            <td>{% if amount < 0 %} {{amount * -1}} {% else %} - {% endif %}</td>
+                            <td>
+                                <a href="#" class="btn btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                    
+
+
+                {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+

@@ -32,8 +32,6 @@ def get_db():
     finally:
         db.close()
 
-
-
 templates = Jinja2Templates(directory="templates")
 
 db_dependency = Annotated[Session, Depends(get_db)]
@@ -57,7 +55,6 @@ async def read_all_ledgers(user: user_dependency, request: Request, db: Session 
             date_filter = datetime.strptime(date_filter, "%Y-%m-%d").date()
             query = query.filter(Ledgers.ledger_date == date_filter)
         except ValueError:
-            # Handle invalid date format error here
             pass
 
     ledgers = query.all()
