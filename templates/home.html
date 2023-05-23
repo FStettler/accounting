@@ -11,9 +11,13 @@
             
             <form method="get" action="{{ request.url.path }}">
                 <span>If no date is specified, the system will list all ledgers</span>
-                <br><label for="date_filter">Filter by date:</label>
-                <input type="date" id="date_filter" name="date_filter">
-                <button type="submit">Filter</button>
+                <div>
+                    <label for="date_filter">From date:</label>
+                    <label for="date_filter">Until date:</label>
+                </div>
+                    <input type="date" id="start_date_filter" name="start_date_filter">
+                    <input type="date" id="end_date_filter" name="end_date_filter">
+                    <button type="submit">Filter</button>
             </form>
               
             <table class="table table-hover">

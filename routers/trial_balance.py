@@ -35,20 +35,36 @@ user_dependency = Annotated[dict,Depends(get_current_user)]
 
 
 @router.get("/", response_class=HTMLResponse)
-async def trial_balance_by_period(user: user_dependency, request: Request, db: db_dependency, date_filter: Optional[str] = None):
+async def trial_balance_by_period(user: user_dependency, request: Request, db: db_dependency, start_date_filter: Optional[str] = None, end_date_filter: Optional[str] = None):
     
     if user is None:
         return RedirectResponse(url="/auth", status_code=status.HTTP_302_FOUND) 
     
     query = db.query(Ledgers).filter(Ledgers.user_id == user.get('id'))
 
-    if date_filter:
+    if start_date_filter and end_date_filter:
         try:
-            date_filter = datetime.strptime(date_filter, "%Y-%m-%d").date()
-            query = query.filter(Ledgers.ledger_date == date_filter)
+            start_date_filter = datetime.strptime(start_date_filter, "%Y-%m-%d").date()
+            end_date_filter = datetime.strptime(end_date_filter, "%Y-%m-%d").date()
+            query = query.filter(Ledgers.ledger_date >= start_date_filter).filter(Ledgers.ledger_date <= end_date_filter)
         except ValueError:
             pass
-    
+
+    if start_date_filter and not end_date_filter:
+        try:
+            start_date_filter = datetime.strptime(start_date_filter, "%Y-%m-%d").date()
+            query = query.filter(Ledgers.ledger_date >= start_date_filter)
+        except ValueError:
+            pass
+
+    if not start_date_filter and end_date_filter:
+        try:
+            end_date_filter = datetime.strptime(end_date_filter, "%Y-%m-%d").date()
+            query = query.filter(Ledgers.ledger_date <= end_date_filter)
+        except ValueError:
+            pass
+
+
     trial_balance = {}
     
     for ledger in query:
